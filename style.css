@@ -22,6 +22,26 @@ body{
 .space{
     background: lightcyan;
     display: flex;
+    justify-content: center;
+    align-items: center;
     height: 10vw;
     width: 10vw;
+}
+.odd > .even{
+    background: black;
+}
+.even > .odd{
+    background: black;
+}
+.p1{
+    background: white;
+    border-radius: 50%;
+    height: 85%;
+    width: 85%;
+}
+.p2{
+    background: lightcoral;
+    border-radius: 50%;
+    height: 85%;
+    width: 85%;
 }
