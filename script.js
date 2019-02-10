@@ -2,13 +2,21 @@ $(document).ready(initializeGame);
 
 // DOM
 function initializeGame(){
-    attachClickHandlers();
     renderNewBoard();
+    attachClickHandlers();
 };
 
 function attachClickHandlers(){
-    // $(".space").on("click", testFunction);
+    p1Click();
+    p2Click();
 };
+
+function p1Click(){
+    $('.p1').on("click", testFunction);
+}
+function p2Click(){
+    $('.p2').on("click", testFunction);
+}
 
 function testFunction(){
     console.log("test function console log");
