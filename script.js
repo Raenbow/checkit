@@ -1,6 +1,5 @@
 $(document).ready(initializeGame);
 
-// DOM
 function initializeGame(){
     renderNewBoard();
     attachClickHandlers();
@@ -10,33 +9,38 @@ function attachClickHandlers(){
     playerSwitch();
 };
 
+// ====================================================== gameObject
+var gameObj = {
+    gameboard: [],
+    playerTurn: '1',
+    selectedPiece: {
+        rowIndex: null,
+        spaceIndex: null
+    },
+    proposedMove: {
+        moveToRowIndex: null,
+        moveToSpaceIndex: null
+    }
+}
+
+// ====================================================== Click Switches
 function p1ClickOn(){
-    $('.p1').on("click", movePieceStart);
+    $('.p1').on("click", selectPiece);
 }
 function p1ClickOff(){
     $('.p1').off("click");
 }
 function p2ClickOn(){
-    $('.p2').on("click", movePieceStart);
+    $('.p2').on("click", selectPiece);
 }
 function p2ClickOff(){
     $('.p2').off("click");
 }
 function spaceClickOn(){
-    $('.space').on("click", movePieceGoTo);
+    $('.space').on("click", movePieceTo);
 }
 function spaceClickOff(){
     $('.space').off("click");
-}
-
-function testFunction(){
-    console.log("test function console log");
-};
-
-// gameObject
-var gameObj = {
-    gameboard: [],
-    playerTurn: '1'
 }
 
 function playerSwitch(){
@@ -49,16 +53,18 @@ function playerSwitch(){
     }
 };
 
+// ====================================================== So Fresh So Clean
+
 function renderNewBoard(){
     gameObj.gameboard = [
-        ['0','1','0','1','0','1','0','1'],
-        ['1','0','1','0','1','0','1','0'],
-        ['0','1','0','1','0','1','0','1'],
-        ['0','0','0','0','0','0','0','0'],
-        ['0','0','0','0','0','0','0','0'],
-        ['2','0','2','0','2','0','2','0'],
-        ['0','2','0','2','0','2','0','2'],
-        ['2','0','2','0','2','0','2','0'],
+        ['','1','','1','','1','','1'],
+        ['1','','1','','1','','1',''],
+        ['','1','','1','','1','','1'],
+        ['0','','0','','0','','0',''],
+        ['','0','','0','','0','','0'],
+        ['2','','2','','2','','2',''],
+        ['','2','','2','','2','','2'],
+        ['2','','2','','2','','2',''],
     ];
     
     for(numOfRows = 0; numOfRows < 8; numOfRows++){
@@ -74,27 +80,26 @@ function renderNewBoard(){
     }
 };
 
-function movePieceStart(event){
+// ====================================================== Piece Movement
+
+function selectPiece(event){
     if(gameObj.playerTurn==='1' && $(this).hasClass('p1')){
-        // find the index in relation to the gameboard variable
-        var spaceIndex = $(this).parent().index();
-        var rowIndex = $(this).parent().parent().index();
+        // find the index in relation to the gameboard variable & save the location
+        gameObj.selectedPiece.spaceIndex = $(this).parent().index();
+        gameObj.selectedPiece.rowIndex = $(this).parent().parent().index();
         // replace the 1 with a 0 in the gameboard variable
-        gameObj.gameboard[rowIndex][spaceIndex] = '0';
+        gameObj.gameboard[gameObj.selectedPiece.rowIndex][gameObj.selectedPiece.spaceIndex] = '0';
         // remove DOM element for clicked $(this) element
         $(this).remove();
         // turn off piece clicking
         p1ClickOff();
-
-        console.log('p1 piece move function index: ', rowIndex, spaceIndex);
-        console.log(gameObj.gameboard[rowIndex][spaceIndex]);
     }
     if(gameObj.playerTurn==='2' && $(this).hasClass('p2')){
-        // find the index in relation to the gameboard variable
-        var spaceIndex = $(this).parent().index();
-        var rowIndex = $(this).parent().parent().index();
+        // find the index in relation to the gameboard variable & save the location
+        gameObj.selectedPiece.spaceIndex = $(this).parent().index();
+        gameObj.selectedPiece.rowIndex = $(this).parent().parent().index();
         // replace the 1 with a 0 in the gameboard variable
-        gameObj.gameboard[rowIndex][spaceIndex] = '0';
+        gameObj.gameboard[gameObj.selectedPiece.rowIndex][gameObj.selectedPiece.spaceIndex] = '0';
         // remove DOM element for clicked $(this) element
         $(this).remove();
         // turn off piece clicking
@@ -106,37 +111,43 @@ function movePieceStart(event){
     event.stopPropagation();
 }
 
-function movePieceGoTo(){
-    var moveToSpaceIndex = $(this).index();
-    var moveToRowIndex = $(this).parent().index();
-    console.log('row: ', moveToRowIndex,' space: ', moveToSpaceIndex);
+function movePieceTo(){
+    gameObj.proposedMove.moveToSpaceIndex = $(this).index();
+    gameObj.proposedMove.moveToRowIndex = $(this).parent().index();
 
-    if(gameObj.gameboard[moveToRowIndex][moveToSpaceIndex]==='0'){
+    if(gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex]==='0'){
+
         if(gameObj.playerTurn==='1'){
+
             // replace 0 with 1 in gameboard vairable where clicked
-            gameObj.gameboard[moveToRowIndex][moveToSpaceIndex] = '1';
+            gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex] = '1';
 
             // create new DOM element in relation to where new 1 was placed
             var p1Piece = $('<div>', {class: 'p1'});
             $(this).append(p1Piece);
 
+            // turn off space clicks
+            spaceClickOff();
             // switch player turn
             gameObj.playerTurn = '2';
+            playerSwitch();
 
         } else if(gameObj.playerTurn==='2'){
             // replace 0 with 1 in gameboard vairable where clicked
-            gameObj.gameboard[moveToRowIndex][moveToSpaceIndex] = '2';
+            gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex] = '2';
 
             // create new DOM element in relation to where new 1 was placed
             var p2Piece = $('<div>', {class: 'p2'});
             $(this).append(p2Piece);
 
+            // turn off space clicks
+            spaceClickOff();
             // switch player turn
             gameObj.playerTurn = '1';
+            playerSwitch();
         }
     }
-    // turn off space clicks
-    spaceClickOff();
-    // switch player turn
-    playerSwitch();
+};
+
+function isItValid(){
 };
