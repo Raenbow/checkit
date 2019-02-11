@@ -105,7 +105,6 @@ function selectPiece(event){
         // turn off piece clicking
         p2ClickOff();
     }
-    // (determine which empty spaces SHOULD be clickable)
     // make those empty spaces clickable
     spaceClickOn();
     event.stopPropagation();
@@ -115,39 +114,55 @@ function movePieceTo(){
     gameObj.proposedMove.moveToSpaceIndex = $(this).index();
     gameObj.proposedMove.moveToRowIndex = $(this).parent().index();
 
-    if(gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex]==='0'){
+    if(isItValid()){
+        // if(gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex]==='0'){
 
-        if(gameObj.playerTurn==='1'){
+            if(gameObj.playerTurn==='1'){
+                // replace 0 with 1 in gameboard vairable where clicked
+                gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex] = '1';
 
-            // replace 0 with 1 in gameboard vairable where clicked
-            gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex] = '1';
+                // create new DOM element in relation to where new 1 was placed
+                var p1Piece = $('<div>', {class: 'p1'});
+                $(this).append(p1Piece);
 
-            // create new DOM element in relation to where new 1 was placed
-            var p1Piece = $('<div>', {class: 'p1'});
-            $(this).append(p1Piece);
+                // turn off space clicks
+                spaceClickOff();
+                // switch player turn
+                gameObj.playerTurn = '2';
+                playerSwitch();
 
-            // turn off space clicks
-            spaceClickOff();
-            // switch player turn
-            gameObj.playerTurn = '2';
-            playerSwitch();
+            } else if(gameObj.playerTurn==='2'){
+                // replace 0 with 1 in gameboard vairable where clicked
+                gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex] = '2';
 
-        } else if(gameObj.playerTurn==='2'){
-            // replace 0 with 1 in gameboard vairable where clicked
-            gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex] = '2';
+                // create new DOM element in relation to where new 1 was placed
+                var p2Piece = $('<div>', {class: 'p2'});
+                $(this).append(p2Piece);
 
-            // create new DOM element in relation to where new 1 was placed
-            var p2Piece = $('<div>', {class: 'p2'});
-            $(this).append(p2Piece);
-
-            // turn off space clicks
-            spaceClickOff();
-            // switch player turn
-            gameObj.playerTurn = '1';
-            playerSwitch();
-        }
+                // turn off space clicks
+                spaceClickOff();
+                // switch player turn
+                gameObj.playerTurn = '1';
+                playerSwitch();
+            }
+        // }
     }
 };
 
 function isItValid(){
+    
+    if(gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex]==='0'){
+        if(gameObj.playerTurn==='1'){
+            if(gameObj.proposedMove.moveToRowIndex===gameObj.selectedPiece.rowIndex+1){
+                return true;
+            };
+
+        } else if(gameObj.playerTurn==='2'){
+            if(gameObj.proposedMove.moveToRowIndex===gameObj.selectedPiece.rowIndex-1){
+                return true;
+            };
+        };
+    } else{
+        console.log('you cant move that direction!');
+    }
 };
