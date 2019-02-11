@@ -105,7 +105,6 @@ function selectPiece(event){
         // turn off piece clicking
         p2ClickOff();
     }
-    // (determine which empty spaces SHOULD be clickable)
     // make those empty spaces clickable
     spaceClickOn();
     event.stopPropagation();
@@ -115,10 +114,8 @@ function movePieceTo(){
     gameObj.proposedMove.moveToSpaceIndex = $(this).index();
     gameObj.proposedMove.moveToRowIndex = $(this).parent().index();
 
-    if(gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex]==='0'){
-
+    if(isItValid()){
         if(gameObj.playerTurn==='1'){
-
             // replace 0 with 1 in gameboard vairable where clicked
             gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex] = '1';
 
@@ -145,9 +142,35 @@ function movePieceTo(){
             // switch player turn
             gameObj.playerTurn = '1';
             playerSwitch();
-        }
-    }
+        };
+    };
 };
 
 function isItValid(){
+    // Empty Space Check
+    if(gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex]==='0'){
+        if(gameObj.playerTurn==='1'){
+            // Single Forward Move
+            if(gameObj.proposedMove.moveToRowIndex===gameObj.selectedPiece.rowIndex+1){
+                return true;
+            } else if(gameObj.gameboard[gameObj.proposedMove.moveToRowIndex-1][gameObj.proposedMove.moveToSpaceIndex-1]==='2' || gameObj.gameboard[gameObj.proposedMove.moveToRowIndex-1][gameObj.proposedMove.moveToSpaceIndex+1]==='2'){
+                console.log('JUMPEH JUMPEH');
+                // run jump function
+                return true;
+            }
+
+        } else if(gameObj.playerTurn==='2'){
+            // Single Forward Move
+            if(gameObj.proposedMove.moveToRowIndex===gameObj.selectedPiece.rowIndex-1){
+                return true;
+            };
+        };
+    } else{
+        console.log('you cant move that way!');
+    };
 };
+
+function jump(){
+    //remove jumped piece
+    //increase score
+}
