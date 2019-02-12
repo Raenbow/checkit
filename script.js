@@ -156,14 +156,16 @@ function movePieceTo(){
 function isItValid(){
     // Empty Space Check
     if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex]==='0'){
+        // need to make sure pieces aren't moving over two spaces in one move
+        
         ////// PLAYER #1
         if (gameObj.playerTurn==='1'){
             // Single Forward Move
             if (move_p1_SingleForward()){
                 return true;
-            } else if (move_p1_SingleJump()){
+            } else if (move_SingleJump()){
                 // if second jump is possible return false after running a function that keeps it from switching player turns
-                console.log('JUMPEH JUMPEH');
+                console.log('p1 JUMPEH JUMPEH');
                 return true;
             }
         ////// PLAYER #2
@@ -171,10 +173,14 @@ function isItValid(){
             // Single Forward Move
             if (move_p2_SingleForward()){
                 return true;
-            };
+            } else if (move_SingleJump()){
+                // if second jump is possible return false after running a function that keeps it from switching player turns
+                console.log('- p2 JUMPEH JUMPEH');
+                return true;
+            }
         };
     } else {
-        console.log('you cant move that way!');
+        console.log('theres another piece in your way!');
     };
 };
 
@@ -192,14 +198,14 @@ function move_p1_SingleForward(){
         }
     };
 };
-function move_p1_SingleJump(){
-    if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex-1][gameObj.proposedMove.moveToSpaceIndex-1]==='2' 
-    || gameObj.gameboard[gameObj.proposedMove.moveToRowIndex-1][gameObj.proposedMove.moveToSpaceIndex+1]==='2'){
-        return true;
-    }
+// function move_p1_SingleJump(){
+//     if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex-1][gameObj.proposedMove.moveToSpaceIndex-1]==='2' 
+//     || gameObj.gameboard[gameObj.proposedMove.moveToRowIndex-1][gameObj.proposedMove.moveToSpaceIndex+1]==='2'){
+//         return true;
+//     }
     //remove jumped piece
     //increase score
-}
+// }
 
 // =========================== Player 2 Movement
 
@@ -221,3 +227,43 @@ function move_SingleLeftRight(){
         return true;
     };
 };
+
+function move_SingleJump(){
+    if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex] === gameObj.gameboard[gameObj.selectedPiece.rowIndex +2]
+    && gameObj.gameboard[gameObj.proposedMove.moveToSpaceIndex] === gameObj.gameboard[gameObj.selectedPiece.spaceIndex +2]){
+        if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex -1][gameObj.proposedMove.moveToSpaceIndex -1] !== gameObj.playerTurn
+            && gameObj.gameboard[gameObj.proposedMove.moveToRowIndex -1][gameObj.proposedMove.moveToSpaceIndex -1] !== '0'){
+            return true;
+        }
+    } else if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex] === gameObj.gameboard[gameObj.selectedPiece.rowIndex +2]
+    && gameObj.gameboard[gameObj.proposedMove.moveToSpaceIndex] === gameObj.gameboard[gameObj.selectedPiece.spaceIndex -2]){
+        if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex -1][gameObj.proposedMove.moveToSpaceIndex +1] !== gameObj.playerTurn
+            && gameObj.gameboard[gameObj.proposedMove.moveToRowIndex -1][gameObj.proposedMove.moveToSpaceIndex +1] !== '0'){
+            return true;
+        }
+    } else if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex] === gameObj.gameboard[gameObj.selectedPiece.rowIndex -2]
+    && gameObj.gameboard[gameObj.proposedMove.moveToSpaceIndex] === gameObj.gameboard[gameObj.selectedPiece.spaceIndex +2]){
+        if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex +1][gameObj.proposedMove.moveToSpaceIndex -1] !== gameObj.playerTurn
+            && gameObj.gameboard[gameObj.proposedMove.moveToRowIndex +1][gameObj.proposedMove.moveToSpaceIndex -1] !== '0'){
+            return true;
+        }
+    } else if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex] === gameObj.gameboard[gameObj.selectedPiece.rowIndex -2]
+    && gameObj.gameboard[gameObj.proposedMove.moveToSpaceIndex] === gameObj.gameboard[gameObj.selectedPiece.spaceIndex -2]){
+        if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex +1][gameObj.proposedMove.moveToSpaceIndex +1] !== gameObj.playerTurn
+            && gameObj.gameboard[gameObj.proposedMove.moveToRowIndex +1][gameObj.proposedMove.moveToSpaceIndex +1] !== '0'){
+            return true;
+        }
+    }
+
+    // if (gameObj.gameboard[gameObj.selectedPiece.rowIndex -1][gameObj.selectedPiece.spaceIndex -1] !== gameObj.playerTurn 
+    // || gameObj.gameboard[gameObj.selectedPiece.rowIndex -1][gameObj.selectedPiece.rowIndex +1] !== gameObj.playerTurn){
+
+    //     return true;
+    // }
+    //remove jumped piece
+    //increase score
+}
+
+function move_MultiJumpCheck(){
+
+}
