@@ -162,6 +162,7 @@ function isItValid(){
                 return true;
             // Single Forward Jump
             } else if (move_Jump()){
+                // check if multijump is possible here?
                 console.log('p1 JUMPEH JUMPEH');
                 return true;
             }
@@ -172,6 +173,7 @@ function isItValid(){
                 return true;
             // Single Forward Jump
             } else if (move_Jump()){
+                // check if multijump is possible here?
                 console.log('- p2 JUMPEH JUMPEH');
                 return true;
             };
