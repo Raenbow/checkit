@@ -13,6 +13,7 @@ function attachClickHandlers(){
 var gameObj = {
     gameboard: [],
     playerTurn: '1',
+    currentTurn: 'inProgress',
     selectedPiece: {
         rowIndex: null,
         spaceIndex: null
@@ -59,7 +60,15 @@ function playerTurnSwitch(){
         gameObj.playerTurn = '1';
     };
 };
-function playerTurnAndClickSwitch(){
+function currentTurnSwitch(){
+    if (gameObj.currentTurn === 'inProgress'){
+        gameObj.currentTurn = 'done';
+    } else if (gameObj.currentTurn === 'done'){
+        gameObj.currentTurn = 'inProgress';
+    };
+};
+function playerTotalSwitch(){
+    currentTurnSwitch();
     playerTurnSwitch();
     playerPieceClickSwitch();
 };
@@ -144,11 +153,14 @@ function movePieceTo(){
             var p2Piece = $('<div>', {class: 'p2'});
             $(this).append(p2Piece);
         };
-
         // turn off space clicks
         spaceClickOff();
-        // switch player turn
-        playerTurnAndClickSwitch();
+        // check player turn
+        playerPieceClickSwitch();
+        if (gameObj.currentTurn === 'done'){
+            // switch player turn
+            playerTotalSwitch();
+        };
     };
 };
 
@@ -157,23 +169,33 @@ function isItValid(){
     if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex]==='0'){
         ////// PLAYER #1
         if (gameObj.playerTurn==='1'){
+            // Same Spot
+            if (move_SameSpace()){
+                return true;
             // Single Forward Move
-            if (move_p1_SingleForward()){
+            } else if (move_p1_SingleForward()){
+                gameObj.currentTurn = 'done';
                 return true;
             // Single Forward Jump
             } else if (move_Jump()){
-                // check if multijump is possible here?
+                // if multijump !== true then currentTurn = 'done'
+                gameObj.currentTurn = 'done';
                 console.log('p1 JUMPEH JUMPEH');
                 return true;
             }
         ////// PLAYER #2
         } else if (gameObj.playerTurn==='2'){
+            // Same Spot
+            if (move_SameSpace()){
+                return true;
             // Single Forward Move
-            if (move_p2_SingleForward()){
+            } else if (move_p2_SingleForward()){
+                gameObj.currentTurn = 'done';
                 return true;
             // Single Forward Jump
             } else if (move_Jump()){
-                // check if multijump is possible here?
+                // if multijump !== true then currentTurn = 'done'
+                gameObj.currentTurn = 'done';
                 console.log('- p2 JUMPEH JUMPEH');
                 return true;
             };
@@ -212,6 +234,14 @@ function move_p2_SingleForward(){
 }
 
 // =========================== Universal Movement
+
+function move_SameSpace(){
+    if (gameObj.proposedMove.moveToRowIndex === gameObj.selectedPiece.rowIndex 
+    && gameObj.proposedMove.moveToSpaceIndex === gameObj.selectedPiece.spaceIndex){
+        console.log('same spot!');
+        return true;
+    };
+};
 
 function move_SingleLeftRight(){
     if (gameObj.proposedMove.moveToSpaceIndex === gameObj.selectedPiece.spaceIndex +1 || gameObj.proposedMove.moveToSpaceIndex === gameObj.selectedPiece.spaceIndex -1){
@@ -283,6 +313,6 @@ function move_Jump_UpLeft(){
     };
 };
 
-function move_Jump_Multi(){
+function move_Jump_MultiCheck(){
 
 }
