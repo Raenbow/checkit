@@ -110,6 +110,8 @@ function selectPiece(event){
     if(gameObj.playerTurn==='1' && $(this).hasClass('p1')){
         if (canItBeMoved()){
             removeSelectedPiece();
+        } else {
+            console.log('Ohnoes! This p1 piece has no moves available!');
         };
 
         // replace the 1 with a 0 in the gameboard variable
@@ -122,6 +124,8 @@ function selectPiece(event){
     if(gameObj.playerTurn==='2' && $(this).hasClass('p2')){
         if (canItBeMoved()){
             removeSelectedPiece();
+        } else {
+            console.log('Ohnoes! This p2 piece has no moves available!');
         };
         // replace the 1 with a 0 in the gameboard variable
         // gameObj.gameboard[gameObj.selectedPiece.rowIndex][gameObj.selectedPiece.spaceIndex] = '0';
@@ -137,30 +141,34 @@ function selectPiece(event){
 
 // Check if the selected piece has any moves available to it
 function canItBeMoved(){
+
     ///////// Player 1
     if (gameObj.playerTurn === '1'){
         ///////// Regular Piece
         if ($('.row').eq(gameObj.selectedPiece.rowIndex).children().eq(gameObj.selectedPiece.spaceIndex).children().hasClass('p1')){
-            console.log('sup 1');
-            return true;
+            if (move_p1_SingleForward_Check()){
+                console.log('This p1 piece does have possible moves!');
+                return true;
+            };
         ///////// Kinged Piece
         } else if ($('.row').eq(gameObj.selectedPiece.rowIndex).children().eq(gameObj.selectedPiece.spaceIndex).children().hasClass('p1king')){
-            console.log('sup king 1');
+            console.log('This p1 kinged piece does have possible moves!');
             return true;
         };
+
     ///////// Player 2
     } else if (gameObj.playerTurn === '2'){
         ///////// Regular Piece
         if ($('.row').eq(gameObj.selectedPiece.rowIndex).children().eq(gameObj.selectedPiece.spaceIndex).children().hasClass('p2')){
-            console.log('sup 2');
-            return true;
+            if (move_p2_SingleForward_Check()){
+                console.log('This p2 piece does have possible moves!');
+                return true;
+            };
         ///////// Kinged Piece
         } else if ($('.row').eq(gameObj.selectedPiece.rowIndex).children().eq(gameObj.selectedPiece.spaceIndex).children().hasClass('p2king')){
-            console.log('sup king 2');
+            console.log('This p2 kinged piece does have possible moves!');
             return true;
         };
-    } else {
-        console.log('that piece has no open moves');
     };
 };
 
@@ -255,6 +263,12 @@ function isItValid(){
 
 // =========================== Player 1 Movement
 
+function move_p1_SingleForward_Check(){
+    if (gameObj.gameboard[gameObj.selectedPiece.rowIndex +1][gameObj.selectedPiece.spaceIndex +1] === '0'
+    || gameObj.gameboard[gameObj.selectedPiece.rowIndex +1][gameObj.selectedPiece.spaceIndex -1] === '0'){
+        return true;
+    };
+};
 function move_p1_SingleForward(){
     // down one row
     if (gameObj.proposedMove.moveToRowIndex === gameObj.selectedPiece.rowIndex +1){
@@ -262,12 +276,18 @@ function move_p1_SingleForward(){
         if (move_SingleLeftRight()){
             console.log('p1 single forward move');
             return true;
-        }
+        };
     };
 };
 
 // =========================== Player 2 Movement
 
+function move_p2_SingleForward_Check(){
+    if (gameObj.gameboard[gameObj.selectedPiece.rowIndex -1][gameObj.selectedPiece.spaceIndex +1] === '0'
+    || gameObj.gameboard[gameObj.selectedPiece.rowIndex -1][gameObj.selectedPiece.spaceIndex -1] === '0'){
+        return true;
+    };
+};
 function move_p2_SingleForward(){
     // up one row
     if (gameObj.proposedMove.moveToRowIndex === gameObj.selectedPiece.rowIndex -1){
