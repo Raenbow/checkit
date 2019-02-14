@@ -171,9 +171,9 @@ function removeSelectedPiece(){
     $('.row').eq(gameObj.selectedPiece.rowIndex).children().eq(gameObj.selectedPiece.spaceIndex).children().remove();
 
     // turn off piece clicking
-    if(gameObj.playerTurn==='1' && $(this).hasClass('p1')){
+    if(gameObj.playerTurn==='1'){
         p1ClickOff();
-    } else if(gameObj.playerTurn==='2' && $(this).hasClass('p2')){
+    } else if(gameObj.playerTurn==='2'){
         p2ClickOff();
     };
 };
