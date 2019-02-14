@@ -103,32 +103,80 @@ function renderNewBoard(){
 // ====================================================== Piece Movement
 
 function selectPiece(event){
+        // find the index in relation to the gameboard variable & save the location
+        gameObj.selectedPiece.spaceIndex = $(this).parent().index();
+        gameObj.selectedPiece.rowIndex = $(this).parent().parent().index();
+
     if(gameObj.playerTurn==='1' && $(this).hasClass('p1')){
-        // find the index in relation to the gameboard variable & save the location
-        gameObj.selectedPiece.spaceIndex = $(this).parent().index();
-        gameObj.selectedPiece.rowIndex = $(this).parent().parent().index();
+        if (canItBeMoved()){
+            removeSelectedPiece();
+        };
+
         // replace the 1 with a 0 in the gameboard variable
-        gameObj.gameboard[gameObj.selectedPiece.rowIndex][gameObj.selectedPiece.spaceIndex] = '0';
+        // gameObj.gameboard[gameObj.selectedPiece.rowIndex][gameObj.selectedPiece.spaceIndex] = '0';
         // remove DOM element for clicked $(this) element
-        $(this).remove();
+        // $(this).remove();
         // turn off piece clicking
-        p1ClickOff();
-    }
+        // p1ClickOff();
+    };
     if(gameObj.playerTurn==='2' && $(this).hasClass('p2')){
-        // find the index in relation to the gameboard variable & save the location
-        gameObj.selectedPiece.spaceIndex = $(this).parent().index();
-        gameObj.selectedPiece.rowIndex = $(this).parent().parent().index();
+        if (canItBeMoved()){
+            removeSelectedPiece();
+        };
         // replace the 1 with a 0 in the gameboard variable
-        gameObj.gameboard[gameObj.selectedPiece.rowIndex][gameObj.selectedPiece.spaceIndex] = '0';
+        // gameObj.gameboard[gameObj.selectedPiece.rowIndex][gameObj.selectedPiece.spaceIndex] = '0';
         // remove DOM element for clicked $(this) element
-        $(this).remove();
+        // $(this).remove();
         // turn off piece clicking
-        p2ClickOff();
-    }
+        // p2ClickOff();
+    };
     // make those empty spaces clickable
     spaceClickOn();
     event.stopPropagation();
 }
+
+// Check if the selected piece has any moves available to it
+function canItBeMoved(){
+    ///////// Player 1
+    if (gameObj.playerTurn === '1'){
+        ///////// Regular Piece
+        if ($('.row').eq(gameObj.selectedPiece.rowIndex).children().eq(gameObj.selectedPiece.spaceIndex).children().hasClass('p1')){
+            console.log('sup 1');
+            return true;
+        ///////// Kinged Piece
+        } else if ($('.row').eq(gameObj.selectedPiece.rowIndex).children().eq(gameObj.selectedPiece.spaceIndex).children().hasClass('p1king')){
+            console.log('sup king 1');
+            return true;
+        };
+    ///////// Player 2
+    } else if (gameObj.playerTurn === '2'){
+        ///////// Regular Piece
+        if ($('.row').eq(gameObj.selectedPiece.rowIndex).children().eq(gameObj.selectedPiece.spaceIndex).children().hasClass('p2')){
+            console.log('sup 2');
+            return true;
+        ///////// Kinged Piece
+        } else if ($('.row').eq(gameObj.selectedPiece.rowIndex).children().eq(gameObj.selectedPiece.spaceIndex).children().hasClass('p2king')){
+            console.log('sup king 2');
+            return true;
+        };
+    } else {
+        console.log('that piece has no open moves');
+    };
+};
+
+function removeSelectedPiece(){
+    // replace the 1 with a 0 in the gameboard variable
+    gameObj.gameboard[gameObj.selectedPiece.rowIndex][gameObj.selectedPiece.spaceIndex] = '0';
+    // remove DOM element for clicked $(this) element
+    $('.row').eq(gameObj.selectedPiece.rowIndex).children().eq(gameObj.selectedPiece.spaceIndex).children().remove();
+
+    // turn off piece clicking
+    if(gameObj.playerTurn==='1' && $(this).hasClass('p1')){
+        p1ClickOff();
+    } else if(gameObj.playerTurn==='2' && $(this).hasClass('p2')){
+        p2ClickOff();
+    };
+};
 
 function movePieceTo(){
     gameObj.proposedMove.moveToSpaceIndex = $(this).index();
@@ -200,8 +248,6 @@ function isItValid(){
                 return true;
             };
         };
-    } else {
-        console.log('theres another piece there!');
     };
 };
 
