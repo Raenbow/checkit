@@ -197,7 +197,7 @@ function movePieceTo(){
     gameObj.proposedMove.moveToRowIndex = $(this).parent().index();
 
     if(isItValid()){
-        ////// PLAYER #1
+        ////// PLAYER #1 PLACE PIECE
         if(gameObj.playerTurn==='1'){
             // replace 0 with 1 in gameboard vairable where clicked
             gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex] = '1';
@@ -206,7 +206,7 @@ function movePieceTo(){
             var p1Piece = $('<div>', {class: 'p1'});
             $(this).append(p1Piece);
 
-        ////// PLAYER #2
+        ////// PLAYER #2 PLACE PIECE
         } else if(gameObj.playerTurn==='2'){
             // replace 0 with 1 in gameboard vairable where clicked
             gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex] = '2';
@@ -215,15 +215,33 @@ function movePieceTo(){
             var p2Piece = $('<div>', {class: 'p2'});
             $(this).append(p2Piece);
         };
+
+        // if (move_Jump_Check()){
+        //     console.log('there are more jumps available to you!');
+        //     return true;
+        // } else{
+        //     console.log('!!! no multijumps available, switching player !!!');
+        //     gameObj.currentTurn = 'done';
+        // }
+
         // turn off space clicks
         spaceClickOff();
         // check player turn
         playerPieceClickSwitch();
+        
         if (gameObj.currentTurn === 'done'){
             // switch player turn
             playerTotalSwitch();
         };
     };
+
+    if (move_Jump_Check()){
+        console.log('there are more jumps available to you!');
+        return true;
+    } else{
+        console.log('!!! no multijumps available!!!');
+        gameObj.currentTurn = 'done';
+    }
 };
 
 function isItValid(){
@@ -236,13 +254,12 @@ function isItValid(){
                 return true;
             // Single Forward Move
             } else if (move_p1_SingleForward()){
-                gameObj.currentTurn = 'done';
                 return true;
-            // Single Forward Jump
+            // Single? Forward Jump
             } else if (move_Jump()){
                 // if multijump !== true then currentTurn = 'done'
-                gameObj.currentTurn = 'done';
-                console.log('p1 JUMPEH JUMPEH');
+                // gameObj.currentTurn = 'done';
+                // console.log('p1 JUMPEH JUMPEH');
                 return true;
             }
         ////// PLAYER #2
@@ -252,13 +269,12 @@ function isItValid(){
                 return true;
             // Single Forward Move
             } else if (move_p2_SingleForward()){
-                gameObj.currentTurn = 'done';
                 return true;
             // Single Forward Jump
             } else if (move_Jump()){
                 // if multijump !== true then currentTurn = 'done'
-                gameObj.currentTurn = 'done';
-                console.log('- p2 JUMPEH JUMPEH');
+                // gameObj.currentTurn = 'done';
+                // console.log('- p2 JUMPEH JUMPEH');
                 return true;
             };
         };
@@ -280,7 +296,10 @@ function move_p1_SingleForward(){
     if (gameObj.proposedMove.moveToRowIndex === gameObj.selectedPiece.rowIndex +1){
         // left or right one space
         if (move_SingleLeftRight()){
-            console.log('p1 single forward move');
+            if (move_Jump_Check() !== true){
+                gameObj.currentTurn = 'done';
+                console.log('p1 single forward move');
+            }
             return true;
         };
     };
@@ -299,7 +318,10 @@ function move_p2_SingleForward(){
     if (gameObj.proposedMove.moveToRowIndex === gameObj.selectedPiece.rowIndex -1){
         // left or right one space
         if (move_SingleLeftRight()){
-            console.log('- p2 single forward move');
+            if (move_Jump_Check() !== true){
+                gameObj.currentTurn = 'done';
+                console.log('- p2 single forward move');
+            }
             return true;
         }
     }
@@ -354,6 +376,7 @@ function move_Jump(){
 
 function move_Jump_DownRight_Check(){
     if (gameObj.gameboard[gameObj.selectedPiece.rowIndex +1][gameObj.selectedPiece.spaceIndex +1] !== gameObj.playerTurn 
+    && gameObj.gameboard[gameObj.selectedPiece.rowIndex +1][gameObj.selectedPiece.spaceIndex +1] !== '0' 
     && gameObj.gameboard[gameObj.selectedPiece.rowIndex +2][gameObj.selectedPiece.spaceIndex +2] === '0'){
         return true;
     };
@@ -372,6 +395,7 @@ function move_Jump_DownRight(){
 
 function move_Jump_DownLeft_Check(){
     if (gameObj.gameboard[gameObj.selectedPiece.rowIndex +1][gameObj.selectedPiece.spaceIndex -1] !== gameObj.playerTurn 
+    && gameObj.gameboard[gameObj.selectedPiece.rowIndex +1][gameObj.selectedPiece.spaceIndex -1] !== '0' 
     && gameObj.gameboard[gameObj.selectedPiece.rowIndex +2][gameObj.selectedPiece.spaceIndex -2] === '0'){
         return true;
     };
@@ -390,6 +414,7 @@ function move_Jump_DownLeft(){
 
 function move_Jump_UpRight_Check(){
     if (gameObj.gameboard[gameObj.selectedPiece.rowIndex -1][gameObj.selectedPiece.spaceIndex +1] !== gameObj.playerTurn 
+    && gameObj.gameboard[gameObj.selectedPiece.rowIndex -1][gameObj.selectedPiece.spaceIndex +1] !== '0' 
     && gameObj.gameboard[gameObj.selectedPiece.rowIndex -2][gameObj.selectedPiece.spaceIndex +2] === '0'){
         return true;
     };
@@ -408,6 +433,7 @@ function move_Jump_UpRight(){
 
 function move_Jump_UpLeft_Check(){
     if (gameObj.gameboard[gameObj.selectedPiece.rowIndex -1][gameObj.selectedPiece.spaceIndex -1] !== gameObj.playerTurn 
+    && gameObj.gameboard[gameObj.selectedPiece.rowIndex -1][gameObj.selectedPiece.spaceIndex -1] !== '0' 
     && gameObj.gameboard[gameObj.selectedPiece.rowIndex -2][gameObj.selectedPiece.spaceIndex -2] === '0'){
         return true;
     };
