@@ -229,16 +229,20 @@ function movePieceTo(){
         // check player turn
         // playerPieceClickSwitch();
 
-        if (move_Jump_Check(gameObj.proposedMove)){
+        if (move_Jump_Check(gameObj.proposedMove) && gameObj.currentTurn !== 'done'){
             playerPieceClickSwitch();
             console.log('there are more jumps available to you!');
             return true;
-        } else if (gameObj.currentTurn === 'inProgress'){
+        } else if (gameObj.proposedMove.rowIndex === gameObj.selectedPiece.rowIndex 
+        && gameObj.proposedMove.spaceIndex === gameObj.selectedPiece.spaceIndex){
             playerPieceClickSwitch();
             console.log('It\'s still player ', gameObj.playerTurn,'\'s turn!');
-            // console.log('!!! no multijumps available!!!');
-            // gameObj.currentTurn = 'done';
-        } else if (gameObj.currentTurn === 'done'){
+        } else {
+            console.log('!!! no multijumps available!!!');
+            gameObj.currentTurn = 'done';
+        }
+        
+        if (gameObj.currentTurn === 'done'){
             // turn off space clicks
             spaceClickOff();
             // switch player turn
