@@ -233,12 +233,12 @@ function movePieceTo(){
             playerPieceClickSwitch();
             console.log('there are more jumps available to you!');
             return true;
-        } else{
-            console.log('!!! no multijumps available!!!');
-            gameObj.currentTurn = 'done';
-        }
-        
-        if (gameObj.currentTurn === 'done'){
+        } else if (gameObj.currentTurn === 'inProgress'){
+            playerPieceClickSwitch();
+            console.log('It\'s still player ', gameObj.playerTurn,'\'s turn!');
+            // console.log('!!! no multijumps available!!!');
+            // gameObj.currentTurn = 'done';
+        } else if (gameObj.currentTurn === 'done'){
             // turn off space clicks
             spaceClickOff();
             // switch player turn
