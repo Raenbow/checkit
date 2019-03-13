@@ -208,10 +208,10 @@ function movePieceTo(){
 
         ////// PLAYER #2 PLACE PIECE
         } else if(gameObj.playerTurn==='2'){
-            // replace 0 with 1 in gameboard vairable where clicked
+            // replace 0 with 2 in gameboard vairable where clicked
             gameObj.gameboard[gameObj.proposedMove.rowIndex][gameObj.proposedMove.spaceIndex] = '2';
 
-            // create new DOM element in relation to where new 1 was placed
+            // create new DOM element in relation to where new 2 was placed
             var p2Piece = $('<div>', {class: 'p2'});
             $(this).append(p2Piece);
         };
@@ -230,6 +230,7 @@ function movePieceTo(){
         // playerPieceClickSwitch();
 
         if (move_Jump_Check(gameObj.proposedMove)){
+            playerPieceClickSwitch();
             console.log('there are more jumps available to you!');
             return true;
         } else{
