@@ -14,13 +14,14 @@ var gameObj = {
     gameboard: [],
     playerTurn: '1',
     currentTurn: 'inProgress',
+    multiJump: false,
     selectedPiece: {
         rowIndex: null,
         spaceIndex: null
     },
     proposedMove: {
-        moveToRowIndex: null,
-        moveToSpaceIndex: null
+        rowIndex: null,
+        spaceIndex: null
     }
 }
 
@@ -52,6 +53,7 @@ function playerPieceClickSwitch(){
         p1ClickOff();
         p2ClickOn();
     };
+    spaceClickOff();
 };
 function playerTurnSwitch(){
     if (gameObj.playerTurn==='1'){
@@ -108,34 +110,27 @@ function selectPiece(event){
         gameObj.selectedPiece.rowIndex = $(this).parent().parent().index();
 
     if(gameObj.playerTurn==='1' && $(this).hasClass('p1')){
-        if (canItBeMoved()){
+        if (gameObj.multiJump === true
+        && gameObj.proposedMove.rowIndex === gameObj.selectedPiece.rowIndex 
+        && gameObj.proposedMove.spaceIndex === gameObj.selectedPiece.spaceIndex){
+            removeSelectedPiece();
+        } else if (canItBeMoved() && gameObj.multiJump === false){
             removeSelectedPiece();
         } else {
             console.log('Ohnoes! This p1 piece has no moves available!');
         };
-
-        // replace the 1 with a 0 in the gameboard variable
-        // gameObj.gameboard[gameObj.selectedPiece.rowIndex][gameObj.selectedPiece.spaceIndex] = '0';
-        // remove DOM element for clicked $(this) element
-        // $(this).remove();
-        // turn off piece clicking
-        // p1ClickOff();
-    };
-    if(gameObj.playerTurn==='2' && $(this).hasClass('p2')){
-        if (canItBeMoved()){
+    } else if(gameObj.playerTurn==='2' && $(this).hasClass('p2')){
+        if (gameObj.multiJump === true
+        && gameObj.proposedMove.rowIndex === gameObj.selectedPiece.rowIndex 
+        && gameObj.proposedMove.spaceIndex === gameObj.selectedPiece.spaceIndex){
+            removeSelectedPiece();
+        } else if (canItBeMoved() && gameObj.multiJump === false){
             removeSelectedPiece();
         } else {
             console.log('Ohnoes! This p2 piece has no moves available!');
         };
-        // replace the 1 with a 0 in the gameboard variable
-        // gameObj.gameboard[gameObj.selectedPiece.rowIndex][gameObj.selectedPiece.spaceIndex] = '0';
-        // remove DOM element for clicked $(this) element
-        // $(this).remove();
-        // turn off piece clicking
-        // p2ClickOff();
     };
-    // make those empty spaces clickable
-    spaceClickOn();
+    //  Prevent added space handler from running
     event.stopPropagation();
 }
 
@@ -146,11 +141,11 @@ function canItBeMoved(){
     if (gameObj.playerTurn === '1'){
         ///////// Regular Piece
         if ($('.row').eq(gameObj.selectedPiece.rowIndex).children().eq(gameObj.selectedPiece.spaceIndex).children().hasClass('p1')){
-            if (move_p1_SingleForward_Check()){
-                console.log('This p1 piece does have possible moves!');
-                return true;
-            } else if (move_Jump_Check()){
+            if (move_Jump_Check(gameObj.selectedPiece)){
                 console.log('This p1 piece does have possible moves - jumps!');
+                return true;
+            } else if (move_p1_SingleForward_Check()){
+                console.log('This p1 piece does have possible moves!');
                 return true;
             };
         ///////// Kinged Piece
@@ -163,11 +158,11 @@ function canItBeMoved(){
     } else if (gameObj.playerTurn === '2'){
         ///////// Regular Piece
         if ($('.row').eq(gameObj.selectedPiece.rowIndex).children().eq(gameObj.selectedPiece.spaceIndex).children().hasClass('p2')){
-            if (move_p2_SingleForward_Check()){
-                console.log('This p2 piece does have possible moves!');
-                return true;
-            } else if (move_Jump_Check()){
+            if (move_Jump_Check(gameObj.selectedPiece)){
                 console.log('This p2 piece does have possible moves - jumps!');
+                return true;
+            } else if (move_p2_SingleForward_Check()){
+                console.log('This p2 piece does have possible moves!');
                 return true;
             };
         ///////// Kinged Piece
@@ -190,45 +185,79 @@ function removeSelectedPiece(){
     } else if(gameObj.playerTurn==='2'){
         p2ClickOff();
     };
+    // make those empty spaces clickable
+    spaceClickOn();
 };
 
 function movePieceTo(){
-    gameObj.proposedMove.moveToSpaceIndex = $(this).index();
-    gameObj.proposedMove.moveToRowIndex = $(this).parent().index();
+    // if (gameObj.multiJump === false){
+        gameObj.proposedMove.spaceIndex = $(this).index();
+        gameObj.proposedMove.rowIndex = $(this).parent().index();
+    // };
 
     if(isItValid()){
-        ////// PLAYER #1
+        ////// PLAYER #1 PLACE PIECE
         if(gameObj.playerTurn==='1'){
             // replace 0 with 1 in gameboard vairable where clicked
-            gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex] = '1';
+            gameObj.gameboard[gameObj.proposedMove.rowIndex][gameObj.proposedMove.spaceIndex] = '1';
 
             // create new DOM element in relation to where new 1 was placed
             var p1Piece = $('<div>', {class: 'p1'});
             $(this).append(p1Piece);
 
-        ////// PLAYER #2
+        ////// PLAYER #2 PLACE PIECE
         } else if(gameObj.playerTurn==='2'){
-            // replace 0 with 1 in gameboard vairable where clicked
-            gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex] = '2';
+            // replace 0 with 2 in gameboard vairable where clicked
+            gameObj.gameboard[gameObj.proposedMove.rowIndex][gameObj.proposedMove.spaceIndex] = '2';
 
-            // create new DOM element in relation to where new 1 was placed
+            // create new DOM element in relation to where new 2 was placed
             var p2Piece = $('<div>', {class: 'p2'});
             $(this).append(p2Piece);
         };
+
+        // if (move_Jump_Check()){
+        //     console.log('there are more jumps available to you!');
+        //     return true;
+        // } else{
+        //     console.log('!!! no multijumps available, switching player !!!');
+        //     gameObj.currentTurn = 'done';
+        // }
+
         // turn off space clicks
-        spaceClickOff();
+        // spaceClickOff();
         // check player turn
-        playerPieceClickSwitch();
+        // playerPieceClickSwitch();
+
+        if (move_Jump_Check(gameObj.proposedMove) && gameObj.currentTurn !== 'done'){
+            playerPieceClickSwitch();
+            gameObj.multiJump = true;
+            console.log('there are more jumps available to you!');
+            return true;
+        } else if (gameObj.proposedMove.rowIndex === gameObj.selectedPiece.rowIndex 
+        && gameObj.proposedMove.spaceIndex === gameObj.selectedPiece.spaceIndex){
+            playerPieceClickSwitch();
+            console.log('It\'s still player ', gameObj.playerTurn,'\'s turn!');
+        } else {
+            console.log('!!! no multijumps available!!!');
+            gameObj.multiJump = false;
+            gameObj.currentTurn = 'done';
+        }
+        
         if (gameObj.currentTurn === 'done'){
+            // turn off space clicks
+            spaceClickOff();
             // switch player turn
             playerTotalSwitch();
         };
+    } else {
+        gameObj.proposedMove.spaceIndex = gameObj.selectedPiece.spaceIndex;
+        gameObj.proposedMove.rowIndex = gameObj.selectedPiece.rowIndex;
     };
 };
 
 function isItValid(){
     // Empty Space Check
-    if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex][gameObj.proposedMove.moveToSpaceIndex]==='0'){
+    if (gameObj.gameboard[gameObj.proposedMove.rowIndex][gameObj.proposedMove.spaceIndex]==='0'){
         ////// PLAYER #1
         if (gameObj.playerTurn==='1'){
             // Same Spot
@@ -236,13 +265,12 @@ function isItValid(){
                 return true;
             // Single Forward Move
             } else if (move_p1_SingleForward()){
-                gameObj.currentTurn = 'done';
                 return true;
-            // Single Forward Jump
+            // Single? Forward Jump
             } else if (move_Jump()){
                 // if multijump !== true then currentTurn = 'done'
-                gameObj.currentTurn = 'done';
-                console.log('p1 JUMPEH JUMPEH');
+                // gameObj.currentTurn = 'done';
+                // console.log('p1 JUMPEH JUMPEH');
                 return true;
             }
         ////// PLAYER #2
@@ -252,13 +280,12 @@ function isItValid(){
                 return true;
             // Single Forward Move
             } else if (move_p2_SingleForward()){
-                gameObj.currentTurn = 'done';
                 return true;
             // Single Forward Jump
             } else if (move_Jump()){
                 // if multijump !== true then currentTurn = 'done'
-                gameObj.currentTurn = 'done';
-                console.log('- p2 JUMPEH JUMPEH');
+                // gameObj.currentTurn = 'done';
+                // console.log('- p2 JUMPEH JUMPEH');
                 return true;
             };
         };
@@ -277,9 +304,14 @@ function move_p1_SingleForward_Check(){
 };
 function move_p1_SingleForward(){
     // down one row
-    if (gameObj.proposedMove.moveToRowIndex === gameObj.selectedPiece.rowIndex +1){
+    if (gameObj.proposedMove.rowIndex === gameObj.selectedPiece.rowIndex +1){
         // left or right one space
         if (move_SingleLeftRight()){
+            // if (move_Jump_Check() !== true){
+                // gameObj.currentTurn = 'done';
+                // console.log('p1 single forward move');
+            // }
+            gameObj.currentTurn = 'done';
             console.log('p1 single forward move');
             return true;
         };
@@ -296,9 +328,14 @@ function move_p2_SingleForward_Check(){
 };
 function move_p2_SingleForward(){
     // up one row
-    if (gameObj.proposedMove.moveToRowIndex === gameObj.selectedPiece.rowIndex -1){
+    if (gameObj.proposedMove.rowIndex === gameObj.selectedPiece.rowIndex -1){
         // left or right one space
         if (move_SingleLeftRight()){
+            // if (move_Jump_Check() !== true){
+                // gameObj.currentTurn = 'done';
+                // console.log('- p2 single forward move');
+            // }
+            gameObj.currentTurn = 'done';
             console.log('- p2 single forward move');
             return true;
         }
@@ -308,30 +345,32 @@ function move_p2_SingleForward(){
 // =========================== Universal Movement
 
 function move_SameSpace(){
-    if (gameObj.proposedMove.moveToRowIndex === gameObj.selectedPiece.rowIndex 
-    && gameObj.proposedMove.moveToSpaceIndex === gameObj.selectedPiece.spaceIndex){
+    if (gameObj.proposedMove.rowIndex === gameObj.selectedPiece.rowIndex 
+    && gameObj.proposedMove.spaceIndex === gameObj.selectedPiece.spaceIndex
+    /*&& gameObj.multiJump === false*/){
         console.log('same spot!');
+        spaceClickOff();
         return true;
     };
 };
 
 function move_SingleLeftRight(){
-    if (gameObj.proposedMove.moveToSpaceIndex === gameObj.selectedPiece.spaceIndex +1 || gameObj.proposedMove.moveToSpaceIndex === gameObj.selectedPiece.spaceIndex -1){
+    if (gameObj.proposedMove.spaceIndex === gameObj.selectedPiece.spaceIndex +1 || gameObj.proposedMove.spaceIndex === gameObj.selectedPiece.spaceIndex -1){
         return true;
     };
 };
 
-function move_Jump_Check(){
+function move_Jump_Check(piece2Check){
     if (gameObj.playerTurn === '1'){
-        if (move_Jump_DownLeft_Check()){
+        if (move_Jump_DownLeft_Check(piece2Check)){
             return true;
-        } else if (move_Jump_DownRight_Check()){
+        } else if (move_Jump_DownRight_Check(piece2Check)){
             return true;
         };
     } else if (gameObj.playerTurn === '2'){
-        if (move_Jump_UpLeft_Check()){
+        if (move_Jump_UpLeft_Check(piece2Check)){
             return true;
-        } else if (move_Jump_UpRight_Check()){
+        } else if (move_Jump_UpRight_Check(piece2Check)){
             return true;
         };
     };
@@ -352,73 +391,111 @@ function move_Jump(){
     };
 };
 
-function move_Jump_DownRight_Check(){
-    if (gameObj.gameboard[gameObj.selectedPiece.rowIndex +1][gameObj.selectedPiece.spaceIndex +1] !== gameObj.playerTurn 
-    && gameObj.gameboard[gameObj.selectedPiece.rowIndex +2][gameObj.selectedPiece.spaceIndex +2] === '0'){
+function isRowOnGameBoard(row){
+    if (row >= 0 && row <= 7){
         return true;
+    };
+};
+function isSpaceOnGameBoard(space){
+    if (space >= 0 && space <= 7){
+        return true;
+    };
+};
+function isOnGameBoard(row, space){
+    return isRowOnGameBoard(row) && isSpaceOnGameBoard(space);
+};
+
+function move_Jump_DownRight_Check(piece2Check){
+    // Checking that the space we're jumping to is on the game board
+    if (isOnGameBoard(piece2Check.rowIndex+2, piece2Check.spaceIndex+2)){
+        if (gameObj.gameboard[piece2Check.rowIndex +1][piece2Check.spaceIndex +1] !== gameObj.playerTurn 
+        && gameObj.gameboard[piece2Check.rowIndex +1][piece2Check.spaceIndex +1] !== '0' 
+        && gameObj.gameboard[piece2Check.rowIndex +2][piece2Check.spaceIndex +2] === '0'){
+            return true;
+        };
+    } else {
+        return false;
     };
 };
 function move_Jump_DownRight(){
-    if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex] === gameObj.gameboard[gameObj.selectedPiece.rowIndex +2]
-    && gameObj.gameboard[gameObj.proposedMove.moveToSpaceIndex] === gameObj.gameboard[gameObj.selectedPiece.spaceIndex +2]){
-        if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex -1][gameObj.proposedMove.moveToSpaceIndex -1] !== gameObj.playerTurn
-        && gameObj.gameboard[gameObj.proposedMove.moveToRowIndex -1][gameObj.proposedMove.moveToSpaceIndex -1] !== '0'){
-            $('.row').eq(gameObj.proposedMove.moveToRowIndex -1).children().eq(gameObj.proposedMove.moveToSpaceIndex -1).children().remove();
-            gameObj.gameboard[gameObj.proposedMove.moveToRowIndex -1][gameObj.proposedMove.moveToSpaceIndex -1] = '0';
+    if (gameObj.gameboard[gameObj.proposedMove.rowIndex] === gameObj.gameboard[gameObj.selectedPiece.rowIndex +2]
+    && gameObj.gameboard[gameObj.proposedMove.spaceIndex] === gameObj.gameboard[gameObj.selectedPiece.spaceIndex +2]){
+        if (gameObj.gameboard[gameObj.proposedMove.rowIndex -1][gameObj.proposedMove.spaceIndex -1] !== gameObj.playerTurn
+        && gameObj.gameboard[gameObj.proposedMove.rowIndex -1][gameObj.proposedMove.spaceIndex -1] !== '0'){
+            $('.row').eq(gameObj.proposedMove.rowIndex -1).children().eq(gameObj.proposedMove.spaceIndex -1).children().remove();
+            gameObj.gameboard[gameObj.proposedMove.rowIndex -1][gameObj.proposedMove.spaceIndex -1] = '0';
             return true;
         };
-    } ;
+    };
 };
 
-function move_Jump_DownLeft_Check(){
-    if (gameObj.gameboard[gameObj.selectedPiece.rowIndex +1][gameObj.selectedPiece.spaceIndex -1] !== gameObj.playerTurn 
-    && gameObj.gameboard[gameObj.selectedPiece.rowIndex +2][gameObj.selectedPiece.spaceIndex -2] === '0'){
-        return true;
+function move_Jump_DownLeft_Check(piece2Check){
+    // Checking that the space we're jumping to is on the game board
+    if (isOnGameBoard(piece2Check.rowIndex+2, piece2Check.spaceIndex-2)){
+        if (gameObj.gameboard[piece2Check.rowIndex +1][piece2Check.spaceIndex -1] !== gameObj.playerTurn 
+        && gameObj.gameboard[piece2Check.rowIndex +1][piece2Check.spaceIndex -1] !== '0' 
+        && gameObj.gameboard[piece2Check.rowIndex +2][piece2Check.spaceIndex -2] === '0'){
+            return true;
+        };
+    } else {
+        return false;
     };
 };
 function move_Jump_DownLeft(){
-    if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex] === gameObj.gameboard[gameObj.selectedPiece.rowIndex +2]
-    && gameObj.gameboard[gameObj.proposedMove.moveToSpaceIndex] === gameObj.gameboard[gameObj.selectedPiece.spaceIndex -2]){
-        if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex -1][gameObj.proposedMove.moveToSpaceIndex +1] !== gameObj.playerTurn
-        && gameObj.gameboard[gameObj.proposedMove.moveToRowIndex -1][gameObj.proposedMove.moveToSpaceIndex +1] !== '0'){
-            $('.row').eq(gameObj.proposedMove.moveToRowIndex -1).children().eq(gameObj.proposedMove.moveToSpaceIndex +1).children().remove();
-            gameObj.gameboard[gameObj.proposedMove.moveToRowIndex -1][gameObj.proposedMove.moveToSpaceIndex +1] = '0';
+    if (gameObj.gameboard[gameObj.proposedMove.rowIndex] === gameObj.gameboard[gameObj.selectedPiece.rowIndex +2]
+    && gameObj.gameboard[gameObj.proposedMove.spaceIndex] === gameObj.gameboard[gameObj.selectedPiece.spaceIndex -2]){
+        if (gameObj.gameboard[gameObj.proposedMove.rowIndex -1][gameObj.proposedMove.spaceIndex +1] !== gameObj.playerTurn
+        && gameObj.gameboard[gameObj.proposedMove.rowIndex -1][gameObj.proposedMove.spaceIndex +1] !== '0'){
+            $('.row').eq(gameObj.proposedMove.rowIndex -1).children().eq(gameObj.proposedMove.spaceIndex +1).children().remove();
+            gameObj.gameboard[gameObj.proposedMove.rowIndex -1][gameObj.proposedMove.spaceIndex +1] = '0';
             return true;
         };
     };
 };
 
-function move_Jump_UpRight_Check(){
-    if (gameObj.gameboard[gameObj.selectedPiece.rowIndex -1][gameObj.selectedPiece.spaceIndex +1] !== gameObj.playerTurn 
-    && gameObj.gameboard[gameObj.selectedPiece.rowIndex -2][gameObj.selectedPiece.spaceIndex +2] === '0'){
-        return true;
+function move_Jump_UpRight_Check(piece2Check){
+    // Checking that the space we're jumping to is on the game board
+    if (isOnGameBoard(piece2Check.rowIndex-2, piece2Check.spaceIndex+2)){
+        if (gameObj.gameboard[piece2Check.rowIndex -1][piece2Check.spaceIndex +1] !== gameObj.playerTurn 
+        && gameObj.gameboard[piece2Check.rowIndex -1][piece2Check.spaceIndex +1] !== '0' 
+        && gameObj.gameboard[piece2Check.rowIndex -2][piece2Check.spaceIndex +2] === '0'){
+            return true;
+        };
+    } else {
+        return false;
     };
 };
 function move_Jump_UpRight(){
-    if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex] === gameObj.gameboard[gameObj.selectedPiece.rowIndex -2]
-    && gameObj.gameboard[gameObj.proposedMove.moveToSpaceIndex] === gameObj.gameboard[gameObj.selectedPiece.spaceIndex +2]){
-        if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex +1][gameObj.proposedMove.moveToSpaceIndex -1] !== gameObj.playerTurn
-        && gameObj.gameboard[gameObj.proposedMove.moveToRowIndex +1][gameObj.proposedMove.moveToSpaceIndex -1] !== '0'){
-            $('.row').eq(gameObj.proposedMove.moveToRowIndex +1).children().eq(gameObj.proposedMove.moveToSpaceIndex -1).children().remove();
-            gameObj.gameboard[gameObj.proposedMove.moveToRowIndex +1][gameObj.proposedMove.moveToSpaceIndex -1] = '0';
+    if (gameObj.gameboard[gameObj.proposedMove.rowIndex] === gameObj.gameboard[gameObj.selectedPiece.rowIndex -2]
+    && gameObj.gameboard[gameObj.proposedMove.spaceIndex] === gameObj.gameboard[gameObj.selectedPiece.spaceIndex +2]){
+        if (gameObj.gameboard[gameObj.proposedMove.rowIndex +1][gameObj.proposedMove.spaceIndex -1] !== gameObj.playerTurn
+        && gameObj.gameboard[gameObj.proposedMove.rowIndex +1][gameObj.proposedMove.spaceIndex -1] !== '0'){
+            $('.row').eq(gameObj.proposedMove.rowIndex +1).children().eq(gameObj.proposedMove.spaceIndex -1).children().remove();
+            gameObj.gameboard[gameObj.proposedMove.rowIndex +1][gameObj.proposedMove.spaceIndex -1] = '0';
             return true;
         };
     };
 };
 
-function move_Jump_UpLeft_Check(){
-    if (gameObj.gameboard[gameObj.selectedPiece.rowIndex -1][gameObj.selectedPiece.spaceIndex -1] !== gameObj.playerTurn 
-    && gameObj.gameboard[gameObj.selectedPiece.rowIndex -2][gameObj.selectedPiece.spaceIndex -2] === '0'){
-        return true;
+function move_Jump_UpLeft_Check(piece2Check){
+    // Checking that the space we're jumping to is on the game board
+    if (isOnGameBoard(piece2Check.rowIndex-2, piece2Check.spaceIndex-2)){
+        if (gameObj.gameboard[piece2Check.rowIndex -1][piece2Check.spaceIndex -1] !== gameObj.playerTurn 
+        && gameObj.gameboard[piece2Check.rowIndex -1][piece2Check.spaceIndex -1] !== '0' 
+        && gameObj.gameboard[piece2Check.rowIndex -2][piece2Check.spaceIndex -2] === '0'){
+            return true;
+        };
+    } else {
+        return false;
     };
 };
 function move_Jump_UpLeft(){
-    if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex] === gameObj.gameboard[gameObj.selectedPiece.rowIndex -2]
-    && gameObj.gameboard[gameObj.proposedMove.moveToSpaceIndex] === gameObj.gameboard[gameObj.selectedPiece.spaceIndex -2]){
-        if (gameObj.gameboard[gameObj.proposedMove.moveToRowIndex +1][gameObj.proposedMove.moveToSpaceIndex +1] !== gameObj.playerTurn
-        && gameObj.gameboard[gameObj.proposedMove.moveToRowIndex +1][gameObj.proposedMove.moveToSpaceIndex +1] !== '0'){
-            $('.row').eq(gameObj.proposedMove.moveToRowIndex +1).children().eq(gameObj.proposedMove.moveToSpaceIndex +1).children().remove();
-            gameObj.gameboard[gameObj.proposedMove.moveToRowIndex +1][gameObj.proposedMove.moveToSpaceIndex +1] = '0';
+    if (gameObj.gameboard[gameObj.proposedMove.rowIndex] === gameObj.gameboard[gameObj.selectedPiece.rowIndex -2]
+    && gameObj.gameboard[gameObj.proposedMove.spaceIndex] === gameObj.gameboard[gameObj.selectedPiece.spaceIndex -2]){
+        if (gameObj.gameboard[gameObj.proposedMove.rowIndex +1][gameObj.proposedMove.spaceIndex +1] !== gameObj.playerTurn
+        && gameObj.gameboard[gameObj.proposedMove.rowIndex +1][gameObj.proposedMove.spaceIndex +1] !== '0'){
+            $('.row').eq(gameObj.proposedMove.rowIndex +1).children().eq(gameObj.proposedMove.spaceIndex +1).children().remove();
+            gameObj.gameboard[gameObj.proposedMove.rowIndex +1][gameObj.proposedMove.spaceIndex +1] = '0';
             return true;
         };
     };
