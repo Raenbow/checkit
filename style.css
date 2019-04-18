@@ -39,8 +39,20 @@ body{
     height: 85%;
     width: 85%;
 }
+.p1king{
+    background: papayawhip;
+    border-radius: 50%;
+    height: 85%;
+    width: 85%;
+}
 .p2{
     background: lightcoral;
+    border-radius: 50%;
+    height: 85%;
+    width: 85%;
+}
+.p2king{
+    background: coral;
     border-radius: 50%;
     height: 85%;
     width: 85%;

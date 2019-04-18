@@ -190,10 +190,9 @@ function removeSelectedPiece(){
 };
 
 function movePieceTo(){
-    // if (gameObj.multiJump === false){
-        gameObj.proposedMove.spaceIndex = $(this).index();
-        gameObj.proposedMove.rowIndex = $(this).parent().index();
-    // };
+
+    gameObj.proposedMove.spaceIndex = $(this).index();
+    gameObj.proposedMove.rowIndex = $(this).parent().index();
 
     if(isItValid()){
         ////// PLAYER #1 PLACE PIECE
@@ -202,8 +201,13 @@ function movePieceTo(){
             gameObj.gameboard[gameObj.proposedMove.rowIndex][gameObj.proposedMove.spaceIndex] = '1';
 
             // create new DOM element in relation to where new 1 was placed
-            var p1Piece = $('<div>', {class: 'p1'});
-            $(this).append(p1Piece);
+            if (gameObj.proposedMove.rowIndex >= 0 && gameObj.proposedMove.rowIndex <= 6){
+                var p1Piece = $('<div>', {class: 'p1'});
+                $(this).append(p1Piece);
+            } else if (gameObj.proposedMove.rowIndex === 7){
+                var p1KingPiece = $('<div>', {class: 'p1king'});
+                $(this).append(p1KingPiece);
+            };
 
         ////// PLAYER #2 PLACE PIECE
         } else if(gameObj.playerTurn==='2'){
@@ -211,23 +215,16 @@ function movePieceTo(){
             gameObj.gameboard[gameObj.proposedMove.rowIndex][gameObj.proposedMove.spaceIndex] = '2';
 
             // create new DOM element in relation to where new 2 was placed
-            var p2Piece = $('<div>', {class: 'p2'});
-            $(this).append(p2Piece);
+            if (gameObj.proposedMove.rowIndex <= 7 && gameObj.proposedMove.rowIndex >= 1){
+                var p2Piece = $('<div>', {class: 'p2'});
+                $(this).append(p2Piece);
+            } else if (gameObj.proposedMove.rowIndex === 0){
+                var p2KingPiece = $('<div>', {class: 'p2king'});
+                $(this).append(p2KingPiece);
+            };
         };
 
-        // if (move_Jump_Check()){
-        //     console.log('there are more jumps available to you!');
-        //     return true;
-        // } else{
-        //     console.log('!!! no multijumps available, switching player !!!');
-        //     gameObj.currentTurn = 'done';
-        // }
-
-        // turn off space clicks
-        // spaceClickOff();
-        // check player turn
-        // playerPieceClickSwitch();
-
+        // Checking if current player's turn is done and if there are more jumps available or not
         if (move_Jump_Check(gameObj.proposedMove) && gameObj.currentTurn !== 'done'){
             playerPieceClickSwitch();
             gameObj.multiJump = true;
@@ -268,9 +265,6 @@ function isItValid(){
                 return true;
             // Single? Forward Jump
             } else if (move_Jump()){
-                // if multijump !== true then currentTurn = 'done'
-                // gameObj.currentTurn = 'done';
-                // console.log('p1 JUMPEH JUMPEH');
                 return true;
             }
         ////// PLAYER #2
@@ -283,9 +277,6 @@ function isItValid(){
                 return true;
             // Single Forward Jump
             } else if (move_Jump()){
-                // if multijump !== true then currentTurn = 'done'
-                // gameObj.currentTurn = 'done';
-                // console.log('- p2 JUMPEH JUMPEH');
                 return true;
             };
         };
@@ -500,7 +491,3 @@ function move_Jump_UpLeft(){
         };
     };
 };
-
-function move_Jump_MultiCheck(){
-
-}
